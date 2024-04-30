@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="main-content-page">
+    <div class="page">
+        {% if homepage %}
+        <div class="page-content-preview">
+            {{ homepage.content | safe }}
+        </div>
+        {% else %}
+        <div class="nopage">
+            <p>No index page has been asssigned</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="page">
+    {% if page %}
+    <div class="page-content-preview">
+        {{ page.content | safe }}
+    </div>
+    {% else %}
+    <div class="nopage">
+        <p>No page to show</p>
+    </div>
+    {% endif %}
+</div>
+<script type="text/javascript"> 
+    let content = document.querySelector(".page-content-preview")
+    if (content.textContent.includes('[contact_form]')) {
+        content.innerHTML = content.textContent.replace("[contact_form]", "{% filter escapejs %}{% include 'partials/_contact.html'%}{% endfilter %}");
+    }
+    let page = document.querySelector(".page")
+    let whiteBg = "{{ page.white_background }}"
+    let width = "{{ page.full_width }}"
+    
+    function whiteBackground() {
+        if (whiteBg == "True") {
+            page.style.cssText += "background-color: #FFF !important;";
+        }
+    }
+    whiteBackground();
+    
+    function pageWidth() {
+        if (width == "True") {
+            if (window.innerWidth > 300) {
+                page.style.cssText += "width: 96vw; !important;padding: 20px 20px;";
+            } else {
+                page.style.cssText += "width: 94vw; !important;padding: 20px 20px;";
+            }
+        }
+    }
+    
+    pageWidth();
+</script>
+{% endblock %}

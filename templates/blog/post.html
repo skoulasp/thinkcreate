@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="post-content">
+    {% include 'partials/_alerts.html'%}
+    {% if messages %}
+    {% for message in messages %}
+    <div  {% if message.tags %} class="message {{ message.tags }}" {% endif %}> {{ message }} 
+    <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+</div>
+{% endfor %}
+{% endif %}
+<div class="main-content-blog-post animated fadeIn">
+    <div class="blog-post">
+        <div class="blog-header">
+            <div class="blog-header-info">
+                <ul>
+                    <li class="author">By <a href="{% url 'profile' post.author.username %}">{{ post.author }}</a> &middot;</li>
+                    <li class="published-date">{{ post.date | naturaltime }} &middot;</li>
+                    <li class="comments"><a href="#view-comments">{{ comments.count }} comments</a></li>
+                    <!-- 		      <li class="shares"><a href="#">1 share</a></li> -->
+                </ul>
+            </div>
+            {% if post.categories.count > 0 %}
+            <div class="blog-header-tags">
+                <div>
+                    Categories:
+                </div>
+                <ul>
+                    {% for cat in post.categories.all %}
+                    <form id="tag-search-post{{ cat }}" action="{% url 'search-cat' %}" class="search-form">
+                        <li>
+                            <input type="hidden" name="q" value="{{ cat }}">
+                            <a href="#" onclick="document.getElementById('tag-search-post{{ cat }}').submit();">
+                        <li>{{ cat }}</li></a>
+                    </form>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else  %}
+            <div class="blog-header-tags">
+                <div>
+                    Uncategorized
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="blog-title">
+            <h1 class="post-title">{{ post.title }}</h1>
+        </div>
+        <div class="blog-content-preview">
+            <p>{{ post.content | safe }}</p>
+        </div>
+    </div>
+</div>
+{% if post.unregistered_commenters or user.is_authenticated %}
+<section class="comments animated fadeIn">
+<div class="comment-box">
+    <h1>Leave a comment</h1>
+    <form id="comment-form" action="" method="POST">
+        {% if post.comments_allowed %}
+        {% if user.is_authenticated %}
+        <h2 style="font-weight:700; font-size: 1.2rem; color: blue;">(Logged in as {{ user.username }})</h2>
+        {% endif %}
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" class="comment-submit">Submit</button>
+    </form>
+    {% else %}
+    <hr style="margin-top: 30px">
+    <h2 style="font-weight:700; font-size: 1.5rem; text-align: center;">Commenting for this post has been disabled</h2>
+    {% endif %}
+    {% elif not post.unregistered_commenters and not user.is_authenticated %}
+    <section class="comments">
+        <div class="comment-box">
+            <hr style="margin-top: 30px">
+            <h2 style="font-weight:700; font-size: 1.5rem; text-align: center;">Only registered users are allowed to comment</h2>
+            {% endif %}
+            {% if comments %}
+            <hr id="view-comments">
+            {% for comment in comments %}
+            <div class="single-comment" id="single-comment-{{comment.id}}">
+                <p class="comment-date">Posted {{comment.date | naturaltime}}</p>
+                {% if comment.user %}
+                <h2 style="font-weight:700; font-size:1.2rem;color:#5000b0;"><a style="text-decoration: none;" href="{% url 'profile' comment.user.username %}"> {{ comment.name }}</a></h2>
+                {% else %}
+                <h2 style="font-weight:700; font-size:1.2rem;color:#7a7a7a;">{{ comment.name }} (visitor)</h2>
+                {% endif %}
+                <p>{{ comment.body | linebreaks }}</p>
+                <div class="likebox">
+                    <ul>
+                        <li>
+                            <span class="like-txt">
+                            {% if comment.get_total_likes %}
+                            <span>
+                            {{comment.get_total_likes}}
+                            </span>
+                            {% else %}
+                            <span>
+                            0
+                            </span>
+                            {% endif %}
+                            </span><a class="like-btn" data-href-like={% url 'comment_likes_api' slug=post.slug comment_id=comment.id option='like' %} href={% url 'comment_likes' slug=post.slug comment_id=comment.id option='like' %} data-likes="{{comment.get_total_likes}}">
+                            {% if request.user in comment.likes.users.all %}<span class="like-active"><i id="comment-like-{{comment.id}}" class="far fa-thumbs-up"></i></span>{% else %}<i id="comment-like-{{comment.id}}" class="far fa-thumbs-up"></i>{% endif %}</a>
+                        </li>
+                        <li>
+                            <span class="dislike-txt">
+                            {% if comment.get_total_dislikes %}
+                            <span>
+                            {{comment.get_total_dislikes}}
+                            </span>
+                            {% else %}
+                            <span>
+                            0
+                            </span>
+                            {% endif %}
+                            </span><a class="unlike-btn" data-href-dislike={% url 'comment_likes_api' slug=post.slug comment_id=comment.id option='dislike' %} href={% url 'comment_likes' slug=post.slug comment_id=comment.id option='dislike' %} data-dislikes="{{comment.get_total_dislikes}}">
+                            {% if request.user in comment.dislikes.users.all %}<span class="dislike-active"><i id="comment-dislike-{{comment.id}}" class="far fa-thumbs-down"></i></span>{% else %}<i id="comment-dislike-{{comment.id}}" class="far fa-thumbs-down"></i>{% endif %}</a>
+                        </li>
+                    </ul>
+                </div>
+                <hr>
+                {% endfor %}
+                {% else %}
+                {% if post.comments_allowed %}
+                <hr>
+                <h2 style="font-weight:700; font-size: 1.5rem; text-align: center;">No one has commented yet</h2>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+</div>
+</section>
+</div>
+<script type="text/javascript">
+    function getCookie(name) {
+       var cookieValue = null;
+       if (document.cookie && document.cookie !== '') {
+           var cookies = document.cookie.split(';');
+           for (var i = 0; i < cookies.length; i++) {
+               var cookie = cookies[i].trim();
+               if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                   cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                   break;
+               }
+           }
+       }
+       return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script>
+    {% block jquery %}
+    
+    function updateCount(btn, count) {
+       if (btn != undefined) {
+           btn.textContent = count;
+       }
+    }
+    
+    $(".like-btn").click(function (e) {
+       e.preventDefault()
+    
+       var this_ = $(this)
+       var likeURL = this_.attr("data-href-like")
+       var dislikeURL = this_.attr("data-href-dislike")
+       var likeCount = parseInt(this_.attr("data-likes"))
+       var dislikeCount = parseInt(this_.attr("data-dislikes"))
+    
+       if (likeURL) {
+           $.ajax({
+               url: likeURL,
+               method: "GET",
+               data: {
+                   csrfmiddlewaretoken: window.CSRF_TOKEN
+               },
+               success: function (data) {
+                   var comment_id = data.id
+                   if (data.option == "like") {
+                       if (!data.reverse_action_like) {
+                           updateCount(this_[0].parentNode.children[0], data.total_likes);
+                           $("#comment-like-" + comment_id).addClass("like-active");
+                           $(".dislike-active").removeClass("dislike-active");
+                           updateCount(this_[0].parentNode.parentNode.children[1].children[0], data.total_dislikes);
+    
+                       } else if (data.reverse_action_like) {
+                           updateCount(this_[0].parentNode.children[0], data.total_likes);
+                           $("#comment-like-" + comment_id).removeClass("like-active");
+                           $(".dislike-active").removeClass("dislike-active");
+                           updateCount(this_[0].parentNode.parentNode.children[1].children[0].children[0], data.total_dislikes);
+                       }
+                   }
+               },
+               error: function (request, status, error) {
+                   if (request.status == 403) {
+                       window.location.href = "/account/login/";
+                   }
+               }
+           })
+       }
+    })
+    
+    $(".unlike-btn").click(function (e) {
+       e.preventDefault()
+    
+       var this_ = $(this)
+       var likeURL = this_.attr("data-href-like")
+       var dislikeURL = this_.attr("data-href-dislike")
+       var likeCount = parseInt(this_.attr("data-likes"))
+       var dislikeCount = parseInt(this_.attr("data-dislikes"))
+    
+       if (dislikeURL) {
+           $.ajax({
+               url: dislikeURL,
+               method: "GET",
+               data: {
+                   csrfmiddlewaretoken: window.CSRF_TOKEN
+               },
+               success: function (data) {
+                   var comment_id = data.id
+                   var newDislikes;
+                   var toggle = false;
+                   if (data.option == "dislike") {
+                       if (!data.reverse_action_dislike) {
+                           updateCount(this_[0].parentNode.children[0], data.total_dislikes);
+                           $("#comment-dislike-" + comment_id).addClass("dislike-active");
+                           $(".like-active").removeClass("like-active");
+                           updateCount(this_[0].parentNode.parentNode.children[0].children[0], data.total_likes);
+                       } else if (data.reverse_action_dislike) {
+                           updateCount(this_[0].parentNode.children[0], data.total_dislikes);
+                           $("#comment-dislike-" + comment_id).removeClass("dislike-active");
+                           $(".like-active").removeClass("like-active");
+                           updateCount(this_[0].parentNode.parentNode.children[0].children[0], data.total_likes);
+                       }
+                   }
+               },
+               error: function (request, status, error) {
+                   if (request.status == 403) {
+                       window.location.href = "/account/login/";
+                   }
+               }
+           })
+       }
+    })
+    
+    {% endblock %}
+</script>
+{% if settings.blog_social %}
+<script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=5eb4593eb892d40012e34581&product=sticky-share-buttons&cms=website' async='async'></script>
+{% endif %}
+{% endblock %}

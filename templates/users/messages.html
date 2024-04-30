@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% load humanize %}
+<div class="main-content-dashboard">
+{% if messages_received or messages_sent %}
+<h1 class="animated fadeInDown">Your Messages</h1>
+{% else %}
+<h1 >No Messages to Show</h1>
+{% endif %}
+<div class="dashboard">
+    {% if messages_received %}
+    <h1 style="text-align: center;" class="animated fadeInLeft">Received Messages</h1>
+    <table class="minimalistBlack animated fadeIn">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Recepient</th>
+                <th>Subject</th>
+                <th>Content</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages_received %}
+            <tr>
+                <td>{{ msg.sender }}</td>
+                <td>{{ msg.receiver }}</td>
+                <td>{{ msg.subject }}</td>
+                <td><a href="{% url 'msg_detail' user.username msg.id %}">{{ msg.message | truncatewords:20 }}</a></td>
+                <td>{{ msg.date | naturaltime }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    {% if messages_sent %}
+    <h1 style="text-align: center;margin-top:90px;" class="animated fadeInLeft">Sent Messages</h1>
+    <table class="minimalistBlack animated fadeIn">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Recepient</th>
+                <th>Subject</th>
+                <th>Content</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in messages_sent %}
+            <tr>
+                <td>{{ msg.sender }}</td>
+                <td>{{ msg.receiver }}</td>
+                <td><a href="{% url 'msg_detail' user.username msg.id %}">{{ msg.subject }}</a></td>
+                <td>{{ msg.message | truncatewords:20 }}</td>
+                <td>{{ msg.date | naturaltime }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    <div class="dash-btns">
+        <a href="{% url 'dashboard' %}" class="edit-profile-btn animated fadeInUp">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

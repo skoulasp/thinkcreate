@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="signup-form">
+    {% include 'partials/_alerts.html' with form=login_form %}
+    {% if messages %}
+    {% for message in messages %}
+    <div  {% if message.tags %} class="message {{ message.tags }} animated fadeIn" {% endif %}>Error: Wrong credentials{% for field in login_form %} {% for error in field.errors %} {% if error %}{{ error|escape }} {% else %} {{ message }} {% endif %}{% endfor %}{% endfor %}
+    <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+</div>
+{% endfor %}
+{% endif %}
+<h1>Existing User Sign In</h1>
+<p>Please enter your account credentials.</p>
+<hr>
+<form action="." method="POST" class="login-form">
+    {% csrf_token %}
+    <fieldset>
+        <i class="fas fa-sign-in-alt"></i>
+        <h2 class="fs-title">Log in with your account</h2>
+        <h3 class="fs-subtitle">Please fill the following fields:</h3>
+        {% for field in login_form  %}
+        {{ field.label_tag }}
+        {% if field.help_text %}
+        <small style="color:grey">{{ field.help_text }}</small>
+        {% endif %}
+        {{ field }}<br>
+        {% endfor %}
+        <div class="singup-btns">
+            <button type="submit" href="#" class="loginbtn">Log in</button>
+        </div>
+    </fieldset>
+</form>
+<div class="alternative">
+    <h3 style="">Don't have an account?</h3>
+    <a href="{% url 'register' %}" class="view-msg-btn">Register</a>
+</div>
+</div> 
+</div>  
+{% endblock %}

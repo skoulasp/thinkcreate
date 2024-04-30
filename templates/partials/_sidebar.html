@@ -1,0 +1,59 @@
+{% load static %}
+{% load humanize %}
+{% if posts or ordered_posts %}
+<div class="sidebar animated fadeInRight">
+<div class="sidebar-search">
+    <h2>Search the blog</h2>
+    <div class="sidebar-search-form">
+        <form id="search-posts" action="{% url 'search-posts' %}" class="search-form">
+            <label for="search-posts" >
+            <input type="search" name="q" placeholder="Search blog..." required>
+            <br>
+            <button type="submit" class="searchbtn">Go</button>
+            </label>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% if most_recent %}
+<div class="most-recent">
+    <h2>Most Recent Posts</h2>
+    <div class="recent-row">
+        <ul>
+            {% for post in most_recent %}
+            <li class="recent-title"><a href="{% url 'post' post.slug %}">{{ post.title }}</a>
+            <li><span class="time-added">{{ post.date | naturaltime }}</span></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% if categories %}
+{% if categories.count > 1 or categories.count > 0 and categories.0.categories__title == 'None' %}
+<div class="categories">
+    <table>
+        <thead>
+            <tr>
+                <th colspan="2">
+                    <h2>Categories</h2>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            {% if cat.categories__title != None %}
+            <tr>
+                <td>
+                    <form id="cat-search-{{cat.categories__title}}" action="{% url 'search-cat' %}" class="search-form">
+                        <li><input type="hidden" name="q" value="{{ cat.categories__title }}"><a href="#" onclick="document.getElementById('cat-search-{{cat.categories__title}}').submit();">{{ cat.categories__title }}</a></li>
+                    </form>
+                </td>
+                <td>{{ cat.categories__title__count}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endif %}

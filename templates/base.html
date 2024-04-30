@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="description" content="{{ settings.meta_tags }}" />
+        {% if page %}
+        <title>{{ page.title | title }} | {{ settings.site_name | title }}</title>
+        {% elif post or posts_list %}
+        <title>{{ settings.site_name | title }} | Blog</title>
+        {% else %}
+        <title>{{ settings.site_name | title }}</title>
+        {% endif %} {% block extrahead %} {% if settings.favicon %}
+        <link rel="shortcut icon" type="image/png" href="{{ settings.favicon.url }}" />
+        {% else %}
+        <link rel="shortcut icon" type="image/png" href="{{ MEDIA_URL }}uploads/favicon/favicon.ico" />
+        {% endif %} {% endblock %}
+        <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    </head>
+    <body>
+        <!-- Navbar -->
+        {% include 'partials/_navbar.html' %}
+        <!-- Content -->
+        <div class="container">
+            <div class="modal"></div>
+            {% block content %} {% endblock %}
+        </div>
+        {% include 'partials/_footer.html' %}
+        <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+        <script type="text/javascript">
+            const pSBC = (p, c0, c1, l) => {
+                let r,
+                    g,
+                    b,
+                    P,
+                    f,
+                    t,
+                    h,
+                    i = parseInt,
+                    m = Math.round,
+                    a = typeof c1 == "string";
+                if (typeof p != "number" || p < -1 || p > 1 || typeof c0 != "string" || (c0[0] != "r" && c0[0] != "#") || (c1 && !a))
+                    return null;
+                if (!this.pSBCr)
+                    this.pSBCr = (d) => {
+                        let n = d.length,
+                            x = {};
+                        if (n > 9) {
+                            ([r, g, b, a] = d = d.split(",")), (n = d.length);
+                            if (n < 3 || n > 4) return null;
+                            (x.r = i(r[3] == "a" ? r.slice(5) : r.slice(4))), (x.g = i(g)), (x.b = i(b)), (x.a = a ? parseFloat(a) : -1);
+                        } else {
+                            if (n == 8 || n == 6 || n < 4) return null;
+                            if (n < 6) d = "#" + d[1] + d[1] + d[2] + d[2] + d[3] + d[3] + (n > 4 ? d[4] + d[4] : "");
+                            d = i(d.slice(1), 16);
+                            if (n == 9 || n == 5)
+                                (x.r = (d >> 24) & 255),
+                                    (x.g = (d >> 16) & 255),
+                                    (x.b = (d >> 8) & 255),
+                                    (x.a = m((d & 255) / 0.255) / 1000);
+                            else (x.r = d >> 16), (x.g = (d >> 8) & 255), (x.b = d & 255), (x.a = -1);
+                        }
+                        return x;
+                    };
+                (h = c0.length > 9),
+                    (h = a ? (c1.length > 9 ? true : c1 == "c" ? !h : false) : h),
+                    (f = this.pSBCr(c0)),
+                    (P = p < 0),
+                    (t = c1 && c1 != "c" ? this.pSBCr(c1) : P ? { r: 0, g: 0, b: 0, a: -1 } : { r: 255, g: 255, b: 255, a: -1 }),
+                    (p = P ? p * -1 : p),
+                    (P = 1 - p);
+                if (!f || !t) return null;
+                if (l) (r = m(P * f.r + p * t.r)), (g = m(P * f.g + p * t.g)), (b = m(P * f.b + p * t.b));
+                else
+                    (r = m((P * f.r ** 2 + p * t.r ** 2) ** 0.5)),
+                        (g = m((P * f.g ** 2 + p * t.g ** 2) ** 0.5)),
+                        (b = m((P * f.b ** 2 + p * t.b ** 2) ** 0.5));
+                (a = f.a), (t = t.a), (f = a >= 0 || t >= 0), (a = f ? (a < 0 ? t : t < 0 ? a : a * P + t * p) : 0);
+                if (h) return "rgb" + (f ? "a(" : "(") + r + "," + g + "," + b + (f ? "," + m(a * 1000) / 1000 : "") + ")";
+                else
+                    return (
+                        "#" +
+                        (4294967296 + r * 16777216 + g * 65536 + b * 256 + (f ? m(a * 255) : 0)).toString(16).slice(1, f ? undefined : -2)
+                    );
+            };
+
+            const navbar = document.querySelector(".main-header");
+            const mainNav = document.querySelector(".main-nav");
+            const mainNavItems = document.querySelector(".main-nav__items");
+            const searchInput = document.getElementById("search-box");
+            const searchInputMobile = document.querySelector(".search-form-mobile");
+            const blogPostWrapper = document.querySelector(".featured");
+            const commentBox = document.querySelector(".comment-box");
+            const footer = document.querySelector(".footer");
+            const mobileMenu = document.querySelector(".mobile-menu");
+            const dropdownMobileGear = document.querySelector(".mobile-dropdown");
+            const dropdownMobileHamburger = document.querySelector(".nav-dropdown");
+            const navMenuMobile = document.querySelector(".nav-menu");
+            let color = "{{ settings.navbar_color }}";
+            let footerColor = "{{ footer.footer_background_color }}";
+            let footerHeaderColor = "{{ footer.footer_header_color }}";
+            let footerLinksColor = "{{ footer.footer_links_color }}";
+            let footerBlogColor = "{{ footer.footer_blog_color }}";
+            let footerTextColor = "{{ footer.footer_text_color }}";
+            let socialColor = "{{ footer.social_media_icons_bg_color }}";
+            let socialIColor = "{{ footer.social_media_icons_i_color }}";
+            let socialIcons = document.querySelectorAll(".social-icon");
+            let lightOrDark = "{{ settings.color_light_or_dark }}";
+            let lightColor = "#ebebeb";
+            let shade = pSBC(-0.6, color);
+            var nodeUserOptions = mainNav.children[2].children[0].getElementsByTagName("li");
+            var nodeMainNav = mainNav.children[1].children[0].getElementsByTagName("li");
+            let style2 = window.getComputedStyle(dropdownMobileGear, "::before");
+            let color2 = style2.getPropertyValue("background-color");
+
+            if (document.querySelector("#close-btn")) {
+                let xIcon = document.querySelector("#close-btn").children[0];
+            }
+
+            if (footer !== null) {
+                footer.setAttribute("style", "background-color:" + footerColor + ";color:" + footerTextColor + ";");
+                document.querySelector(".site-footer").setAttribute("style", "background-color:" + footerColor + ";");
+
+                if (socialIcons !== null) {
+                    for (i = 0; i < socialIcons.length; i++) {
+                        socialIcons[i].setAttribute("style", "color:" + socialIColor + "; background-color:" + socialColor + ";");
+                    }
+
+                    var iconsStyle = document.createElement("style");
+                    iconsStyle.type = "text/css";
+
+                    for (i = 0; i < socialIcons.length; i++) {
+                        if (socialIcons[i].classList.contains("facebook")) {
+                            var iconsDeclarations = document.createTextNode(
+                                ".facebook:hover { color: #FFF !important; background-color: #3b5998 !important;}"
+                            );
+                            if (iconsStyle.styleSheet) {
+                                iconsStyle.styleSheet.cssText = iconsDeclarations.nodeValue;
+                            } else {
+                                iconsStyle.appendChild(iconsDeclarations);
+                            }
+                            socialIcons[i].appendChild(iconsStyle);
+                        } else if (socialIcons[i].classList.contains("twitter")) {
+                            var iconsDeclarations = document.createTextNode(
+                                ".twitter:hover { color: #FFF !important; background-color: #00acee !important;}"
+                            );
+                            if (iconsStyle.styleSheet) {
+                                iconsStyle.styleSheet.cssText = iconsDeclarations.nodeValue;
+                            } else {
+                                iconsStyle.appendChild(iconsDeclarations);
+                            }
+                            socialIcons[i].appendChild(iconsStyle);
+                        } else if (socialIcons[i].classList.contains("instagram")) {
+                            var iconsDeclarations = document.createTextNode(
+                                ".instagram:hover { color: #FFF !important; background-color: #3f729b !important;}"
+                            );
+                            if (iconsStyle.styleSheet) {
+                                iconsStyle.styleSheet.cssText = iconsDeclarations.nodeValue;
+                            } else {
+                                iconsStyle.appendChild(iconsDeclarations);
+                            }
+                            socialIcons[i].appendChild(iconsStyle);
+                        } else if (socialIcons[i].classList.contains("linkedin")) {
+                            var iconsDeclarations = document.createTextNode(
+                                ".linkedin:hover { color: #FFF !important; background-color: #0e76a8 !important;}"
+                            );
+                            if (iconsStyle.styleSheet) {
+                                iconsStyle.styleSheet.cssText = iconsDeclarations.nodeValue;
+                            } else {
+                                iconsStyle.appendChild(iconsDeclarations);
+                            }
+                            socialIcons[i].appendChild(iconsStyle);
+                        }
+                    }
+                }
+
+                if (document.querySelector(".footer-section-a") != null || document.querySelector(".footer-section-a") != undefined) {
+                    let headingAbout = document.querySelector(".footer-section-a").children[0];
+                    if (document.querySelector(".footer-blog-and-pages") != null) {
+                        let headingLinks = document.querySelector(".footer-blog-and-pages").children[0];
+                    }
+                    if (document.querySelector(".blog-span")) {
+                        let headingBlog = document.querySelector(".blog-span").children[0];
+                    }
+
+                    if (headingAbout) {
+                        headingAbout.style.cssText = "color:" + footerHeaderColor + ";";
+                    }
+                    if (typeof headingLinks != "undefined") {
+                        headingLinks.style.cssText = "color:" + footerHeaderColor + ";";
+                    }
+                    if (typeof headingBlog != "undefined") {
+                        headingBlog.style.cssText = "color:" + footerBlogColor + ";";
+                    }
+
+                    if (
+                        document.querySelector(".footer-blog-and-pages") != null &&
+                        document.querySelector(".footer-blog-and-pages").children[1] != undefined
+                    ) {
+                        for (var i = 0; i < document.querySelector(".footer-blog-and-pages").children[1].childElementCount; i++) {
+                            for (var j = 0; j < document.querySelector(".footer-blog-and-pages").children[1].childElementCount - 1; j++) {
+                                if (document.querySelector(".footer-blog-and-pages").children[1].children[i].children[j] != undefined) {
+                                    document.querySelector(".footer-blog-and-pages").children[1].children[i].children[j].style.cssText =
+                                        "color:" + footerLinksColor + ";";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            const blogPostTitle = document.querySelector(".blog");
+            if (blogPostTitle !== null) {
+                var style = document.createElement("style");
+                var declarations = document.createTextNode(".blog:hover { color:" + color + " }");
+
+                style.type = "text/css";
+
+                if (style.styleSheet) {
+                    style.styleSheet.cssText = declarations.nodeValue;
+                } else {
+                    style.appendChild(declarations);
+                }
+
+                blogPostTitle.appendChild(style);
+            }
+
+            navbar.setAttribute("style", "background-color:" + color + ";");
+
+            if (blogPostWrapper !== null) {
+                blogPostWrapper.setAttribute("style", "border-color:" + color + ";");
+            }
+
+            if (commentBox != null && commentBox.children[1].children[5] != undefined) {
+                commentBox.children[1].children[5].setAttribute("style", "color:" + color + "; border-color:" + color + ";");
+
+                var commentStyle = document.createElement("style");
+                var commentDeclarations = document.createTextNode(
+                    ".comment-submit:hover { background-color:" + color + "; color: #FFF !important;}"
+                );
+
+                commentStyle.type = "text/css";
+
+                if (commentStyle.styleSheet) {
+                    commentStyle.styleSheet.cssText = commentDeclarations.nodeValue;
+                } else {
+                    commentStyle.appendChild(commentDeclarations);
+                }
+                commentBox.children[1].children[5].appendChild(commentStyle);
+                commentBox.children[1].children[4].children[1].setAttribute("style", "border-color:" + color + ";");
+                commentBox.children[1].children[2].children[1].setAttribute("style", "background-color:" + color + ";");
+                commentBox.children[1].children[3].children[1].setAttribute("style", "background-color:" + color + ";");
+                if (lightOrDark == "Light") {
+                    commentBox.children[1].children[5].setAttribute("style", "color:" + shade + "; border-color:" + shade + ";");
+                    commentBox.children[1].children[5].appendChild(commentStyle);
+                    commentBox.children[1].children[4].children[1].setAttribute("style", "border-color:" + shade + ";");
+                    commentBox.children[1].children[2].children[1].setAttribute("style", "background-color:" + shade + ";");
+                    commentBox.children[1].children[3].children[1].setAttribute("style", "background-color:" + shade + ";");
+                    var commentStyle = document.createElement("style");
+                    var commentDeclarations = document.createTextNode(
+                        ".comment-submit:hover { background-color:" + shade + "; color: #FFF !important;}"
+                    );
+                    commentStyle.type = "text/css";
+                    if (commentStyle.styleSheet) {
+                        commentStyle.styleSheet.cssText = commentDeclarations.nodeValue;
+                    } else {
+                        commentStyle.appendChild(commentDeclarations);
+                    }
+                }
+            }
+
+            if (lightOrDark == "Very Dark") {
+                var pagination = document.querySelector(".pagination");
+                if (pagination != null || pagination != undefined) {
+                    for (var i = 0; i < pagination.childElementCount; i++) {
+                        if (pagination.children[i].classList.contains("active") && i < 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        } else if (pagination.children[i].classList.contains("active") && i >= 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        }
+                    }
+                }
+
+                document.querySelector(".mobile-menu").style.cssText = "--c: #FFF !important;";
+                if (
+                    document.querySelector(".mobile-menu").children[0] &&
+                    document.querySelector(".mobile-menu").children[0].firstElementChild.firstElementChild != null
+                ) {
+                    document
+                        .querySelector(".mobile-menu")
+                        .children[0].firstElementChild.firstElementChild.setAttribute("style", "color: #FFF !important;");
+                }
+                for (var i = 0; i < navMenuMobile.childElementCount; i++) {
+                    navMenuMobile.children[0].style.cssText = "color: #FFF !important;";
+                    if (navMenuMobile.children[i].firstElementChild) {
+                        navMenuMobile.children[i].firstElementChild.style.cssText = "color: #FFF !important;";
+                    }
+                }
+
+                dropdownMobileGear.style.cssText = "--c: #FFF !important;";
+                dropdownMobileHamburger.style.cssText = "--c: #FFF !important;";
+                mobileMenu.children[0].style.cssText = "--c: #FFF !important;";
+                // for (var i=0;i<mainNav.children[2].children[0].childElementCount;i++) {
+                // 	mainNav.children[1].children[0].children[i].children[0].style.setProperty("color", "#FFF");
+                // }
+                for (var i = 0; i < mainNavItems.children[0].childElementCount; i++) {
+                    if (mainNavItems.children[0].children[i].classList.contains("active-blk")) {
+                        mainNavItems.children[0].children[i].classList.remove("active-blk");
+                        mainNavItems.children[0].children[i].classList.add("active");
+                    }
+                }
+                mainNav.children[0].children[0].style.setProperty("color", "#FFF");
+                if (nodeUserOptions[0].children[0] != null) {
+                    nodeUserOptions[1].children[0].style.setProperty("color", "#FFF");
+                    nodeUserOptions[2].children[0].style.setProperty("color", "#FFF");
+
+                    if (nodeUserOptions[0].children[0].children[0] != null) {
+                        nodeUserOptions[0].children[0].children[0].style.setProperty("color", "#FFF");
+                    }
+                }
+                for (var i = 0; i < mobileMenu.childElementCount; i++) {
+                    mobileMenu.children[i].firstChild.setAttribute("style", "color: #FFF !important;");
+                }
+                if (document.getElementById("search-btn")) {
+                    let searchIcon = document.getElementById("search-btn").children[0];
+                    let xIcon = document.querySelector("#close-btn").children[0];
+                    searchIcon.setAttribute("style", "color:" + lightColor + ";");
+                    searchInput.style.setProperty("placeholder", "#000 !important");
+                    xIcon.setAttribute("style", "color:" + lightColor + ";");
+                    searchInput.style.setProperty("background-color", shade);
+                    searchInputMobile.style.setProperty("background-color", shade);
+                }
+                // searchInput.style.dropdown.children[0].classList.add('fadeOut').setProperty("color", "#FFF");
+            } else if (lightOrDark == "Dark") {
+                var pagination = document.querySelector(".pagination");
+                if (pagination != null || pagination != undefined) {
+                    for (var i = 0; i < pagination.childElementCount; i++) {
+                        if (pagination.children[i].classList.contains("active") && i < 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        } else if (pagination.children[i].classList.contains("active") && i >= 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        }
+                    }
+                }
+
+                for (var i = 0; i < navMenuMobile.childElementCount; i++) {
+                    navMenuMobile.children[0].style.cssText = "color: #FFF !important;";
+                    if (navMenuMobile.children[i].firstElementChild) {
+                        navMenuMobile.children[i].firstElementChild.style.cssText = "color: #FFF !important;";
+                    }
+                }
+                document.querySelector(".mobile-menu").style.cssText = "--c: #FFF !important;";
+                if (
+                    document.querySelector(".mobile-menu").children[0] != undefined &&
+                    document.querySelector(".mobile-menu").children[0].firstElementChild.firstElementChild != null
+                ) {
+                    document
+                        .querySelector(".mobile-menu")
+                        .children[0].firstElementChild.firstElementChild.setAttribute("style", "color: #FFF !important;");
+                }
+
+                dropdownMobileGear.style.cssText = "--c: #FFF !important;";
+                dropdownMobileHamburger.style.cssText = "--c: #FFF !important;";
+                mobileMenu.children[0].style.cssText = "--c: #FFF !important;";
+                for (var i = 0; i < mobileMenu.childElementCount; i++) {
+                    mobileMenu.children[i].firstChild.setAttribute("style", "color: #FFF !important;");
+                }
+                if (document.getElementById("search-btn")) {
+                    let searchIcon = document.getElementById("search-btn").children[0];
+                    let xIcon = document.querySelector("#close-btn").children[0];
+                    searchIcon.setAttribute("style", "color:" + shade + ";");
+                    xIcon.setAttribute("style", "color:" + shade + ";");
+                    searchInput.style.setProperty("placeholder", "#FFF !important");
+                    searchInput.style.setProperty("background-color", shade);
+                    searchInput.style.setProperty("color", "#FFF !important");
+                    searchInputMobile.style.setProperty("background-color", shade);
+                }
+                for (var i = 0; i < mainNavItems.children[0].childElementCount; i++) {
+                    if (mainNavItems.children[0].children[i].classList.contains("active-blk")) {
+                        mainNavItems.children[0].children[i].classList.remove("active-blk");
+                        mainNavItems.children[0].children[i].classList.add("active");
+                    }
+                }
+                mainNav.children[0].children[0].style.setProperty("color", "#FFF");
+                // for (var i=0;i<mainNav.children[2].children[0].childElementCount;i++) {
+                // 	mainNav.children[1].children[0].children[i].children[0].style.setProperty("color", "#FFF");
+                // }
+                if (
+                    nodeUserOptions[0] != null &&
+                    nodeUserOptions[0] != undefined &&
+                    nodeUserOptions[2] != null &&
+                    nodeUserOptions[2] != undefined
+                ) {
+                    nodeUserOptions[1].children[0].style.setProperty("color", "#FFF");
+                    nodeUserOptions[2].children[0].style.setProperty("color", "#FFF");
+
+                    if (nodeUserOptions[0].children[0].children[0] != null) {
+                        nodeUserOptions[0].children[0].children[0].style.setProperty("color", "#FFF");
+                    }
+                }
+            } else if (lightOrDark == "Light") {
+                var pagination = document.querySelector(".pagination");
+                if (pagination != null || pagination != undefined) {
+                    for (var i = 0; i < pagination.childElementCount; i++) {
+                        if (pagination.children[i].classList.contains("active") && i < 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i + 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        } else if (pagination.children[i].classList.contains("active") && i >= 2) {
+                            pagination.children[i].style.cssText =
+                                "background-color:" + color + " !important;border: 1px solid " + shade + ";";
+                            pagination.children[i + 1].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 1].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                            pagination.children[i - 2].children[0].style.cssText = "border: 1px solid " + shade + ";";
+                        }
+                    }
+                }
+
+                for (var i = 0; i < navMenuMobile.childElementCount; i++) {
+                    navMenuMobile.children[0].style.cssText = "color: #000 !important;";
+                    if (navMenuMobile.children[i].firstElementChild) {
+                        navMenuMobile.children[i].firstElementChild.style.cssText = "color: #000 !important;";
+                    }
+                }
+                if (document.querySelector(".mobile-menu")) {
+                    document.querySelector(".mobile-menu").style.cssText = "--c: #000 !important;";
+                    // document.querySelector(".mobile-menu").children[0].firstChild
+                }
+                if (
+                    document.querySelector(".mobile-menu").children[0] != undefined &&
+                    document.querySelector(".mobile-menu").children[0].firstElementChild.firstElementChild != null
+                ) {
+                    document
+                        .querySelector(".mobile-menu")
+                        .children[0].firstElementChild.firstElementChild.setAttribute("style", "color: #000 !important;");
+                }
+                let commentStyle = document.createElement("style");
+                let iconsDeclarations = document.createTextNode(
+                    ".main-nav__items li:hover, .nav-user__items a:not(.no-hover):hover { border-bottom: 2px solid #000;}"
+                );
+                dropdownMobileGear.style.setProperty("--color", "#000 !important;");
+                dropdownMobileGear.style.cssText = "--c: #000 !important;";
+                dropdownMobileHamburger.style.cssText = "--c: #000 !important;";
+                if (mobileMenu.children[0]) {
+                    mobileMenu.children[0].style.cssText = "--c: #000 !important;";
+                }
+                for (var i = 0; i < mobileMenu.childElementCount; i++) {
+                    mobileMenu.children[i].firstChild.setAttribute("style", "color: #000 !important;");
+                }
+                if (commentStyle.styleSheet) {
+                    commentStyle.styleSheet.cssText = iconsDeclarations.nodeValue;
+                } else {
+                    commentStyle.appendChild(iconsDeclarations);
+                }
+                mainNavItems.appendChild(commentStyle);
+                for (var i = 0; i < mainNavItems.children[0].childElementCount; i++) {
+                    if (mainNavItems.children[0].children[i].classList.contains("active")) {
+                        mainNavItems.children[0].children[i].classList.remove("active");
+                        mainNavItems.children[0].children[i].classList.add("active-blk");
+                    }
+                }
+                if (document.getElementById("search-btn")) {
+                    let searchIcon = document.getElementById("search-btn").children[0];
+                    let xIcon = document.querySelector("#close-btn").children[0];
+                    searchIcon.setAttribute("style", "color:" + shade + ";");
+                    xIcon.setAttribute("style", "color:" + shade + ";");
+                    searchInput.style.setProperty("placeholder", "#FFF !important");
+                    searchInput.style.setProperty("background-color", shade);
+                    searchIcon.setAttribute("style", "color:" + shade + ";");
+                    xIcon.setAttribute("style", "color:" + shade + ";");
+                    searchInput.style.setProperty("background-color", shade);
+                    searchInputMobile.style.setProperty("background-color", shade);
+                }
+                mainNav.children[0].children[0].style.setProperty("color", "#000");
+                if (nodeUserOptions[0] != null) {
+                    for (var i = 0; i < nodeUserOptions[0].children[0].childElementCount; i++)
+                        nodeUserOptions[0].children[i].style.setProperty("color", "#000");
+                    if (nodeUserOptions[0].children[0].children[0] != null) {
+                        nodeUserOptions[0].children[0].children[0].style.setProperty("color", "#000");
+                    }
+                }
+                for (var i = 0; i < nodeUserOptions.length; i++) {
+                    nodeUserOptions[i].className = nodeUserOptions[i].className + " blk";
+                    if (
+                        nodeUserOptions[i] != undefined &&
+                        nodeUserOptions[i].firstChild != undefined &&
+                        nodeUserOptions[i].firstChild.classList
+                    ) {
+                        nodeUserOptions[i].firstChild.classList.add("blk");
+                    }
+                }
+
+                for (var i = 0; i < nodeMainNav.length; i++) {
+                    if (nodeMainNav[i].firstElementChild) {
+                        nodeMainNav[i].firstElementChild.classList.add("blk");
+                    }
+                }
+            }
+
+            function addStyle(styleString) {
+                const style = document.createElement("style");
+                style.textContent = styleString;
+                document.head.append(style);
+            }
+
+            let customStyles = "{{ settings.insert_custom_css }}";
+
+            if (customStyles) {
+                addStyle(customStyles);
+            }
+
+            const navUsr = document.querySelector(".nav-user");
+            let navItemsPos = "{{ settings.nav_links_position }}";
+
+            if (navUsr != undefined) {
+                if (navItemsPos != undefined) {
+                    if (navItemsPos == "Center") {
+                        navUsr.setAttribute("style", "flex: 1;");
+                    } else if (navItemsPos == "Right") {
+                        navUsr.setAttribute("style", "flex: 0 1 auto;");
+                    }
+                }
+            }
+
+            const siteName = document.querySelector(".site-name");
+            let siteNameStyling = "{{ settings.standard_styling }}";
+
+            if (siteName != null && siteName != undefined) {
+                if (siteNameStyling) {
+                    if (lightOrDark == "Dark" || lightOrDark == "Very Dark") {
+                        siteName.classList.add("brand-basic-styling");
+                    } else {
+                        siteName.classList.add("brand-basic-styling-light");
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>

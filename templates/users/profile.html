@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="main-content-page"> 
+    {% if messages %}
+    {% for message in messages %}
+    <div  {% if message.tags %} class="message {{ message.tags }}" {% endif %}> {{ message }} 
+    <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+</div>
+{% endfor %}
+{% endif %}
+<h1 style="text-align: center;">{{profile.username}}'s Profile</h1>
+<div class="profile animated fadeIn">
+    <div class="content-section animated fadeInLeft">
+        <div class="profile-img">
+            <span class="profile-text">
+                <h2 class="profile-title">{{ profile.full_name }}</h2>
+            </span>
+            {% if profile.profile.image %}
+            <img src="{{ profile.profile.image.url }}" class="animated fadeIn">
+            {% else %}
+            <img src="{{ MEDIA_URL }}/uploads/profile_images/default.png" class="animated fadeIn">
+            {% endif %}
+            <ul class="profile-body">
+                <li>Username: <span class="profile-text"> {{ username }}</span></li>
+                <li>E-mail Address: <span class="profile-text"> {{ profile.email }}</span></li>
+                <li>Date Joined: <span class="profile-text">{{ profile.date_joined }}</span></li>
+                <li>Last Login: <span class="profile-text">{{ profile.last_login }}</span></li>
+                <li style="margin-top: 20px;margin-bottom: 40px;">User status: <span class="profile-text">{% if profile.is_admin %}<span style="color:red"> Administrator</span>{% elif profile.is_staff and not profile.is_admin %} <span style="color:blue" >Staff Member</span>{% else %}Normal User{% endif %}</span></li>
+            </ul>
+            {% if profile.profile.bio %}
+            <p class="bio-paragraph">Bio: <span class="profile-text" style="font-weight: 400;">{{ profile.profile.bio }}</span></p>
+            {% endif %}
+            {% if user != profile %}
+            <p><a {% if request.user.is_authenticated %} href="{% url 'message' profile.username %}" {% else %} href="{% url 'login' %}" {% endif %} class="msg-btn">Send Message</a></p>
+            {% else %}
+            <p><a {% if request.user.is_authenticated %} href="{% url 'edit' user.username %}" {% else %} href="{% url 'login' %}" {% endif %} class="msg-btn">Edit Profile</a></p>
+            {% endif %}
+        </div>
+        {% if profile.username == request.user.username %}
+        {% if request.user.is_admin %}
+        <p><a href="{% url 'dashboard' %}" class="view-msg-btn">View Dashboard</a></p>
+        {% endif %}
+        {% if request.user.is_staff and not request.user.is_admin %}
+        <p><a href="{% url 'admin:index' %}" class="view-staff-btn">View Staff Panel</a></p>
+        {% endif %}
+        {% endif %}
+        <!-- FORM HERE -->
+    </div>
+    <div class="content-section-b animated fadeInRight">
+        <h1>Recent activity</h1>
+        {% if comments %}
+        {% for comment in comments %}
+        <p>[{{comment.created_on|date:"SHORT_DATE_FORMAT"}} {{comment.created_on|time:"h:i a"}}] {{ profile.full_name }} commented <a href="{% url 'post' comment.post.slug %}">{{ comment.body | truncatewords:20 }}</a> at the post {{comment.post}}</p>
+        {% endfor %}
+        {% else %}
+        <p>No activity</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock content %}

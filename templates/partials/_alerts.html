@@ -1,0 +1,26 @@
+{% if messages %}
+{% for message in messages %}
+{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+{% for field in form %}
+{% for error in field.errors %}
+{% if error %}
+<div class="message animated fadeIn">
+    <div class="alert">
+        {{ message }}
+        <strong>{{ error|escape }}</strong>
+        <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+    </div>
+</div>
+{% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+<div class="message animated fadeIn">
+    <div class="alert">
+        <strong>{{ message.tags | title }}</strong>
+        <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}

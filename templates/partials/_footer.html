@@ -1,0 +1,127 @@
+{% load static %}
+{% if footer.footer_enabled %}
+{% if footer.sticky_footer %}
+<footer class="footer sticky">
+{% else %}
+<footer class="footer">
+    {% endif %}
+    <div class="site-footer">
+        {% if footer.about_text %}
+        <div class="asdf">
+            <div class="footer-section-a">
+                <h6>About</h6>
+                <p class="text-justify">{{footer.about_text}}</p>
+            </div>
+            {% else %}
+            <div class="footer-pages">
+                {% endif %}
+                <div class="footer-section-b">
+                    {% if pages %}
+                    <h6>Quick Links</h6>
+                    <div class="footer-blog-and-pages">
+                        <ul class="footer-links">
+                            {% for page in pages %}
+                            {% if page.page_link_location == 'Footer' or page.page_link_location == 'Both Navbar & Footer' %}
+                            <li><a href="{% url 'page' page.slug %}">{{ page.title }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if footer.blog_section_link %}
+                            <li>
+                                <div class="footer-blog">
+                                    <span class="blog-span"><a href="{% url 'blog' %}">Blog</a></span>
+                                </div>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if not pages and footer.blog_section_link  %}
+                    <div class="footer-blog">
+                        <ul class="footer-links">
+                            <li><span class="blog-span"><a href="{% url 'blog' %}">Blog</a></span>
+                  
+                    </li> 
+                    </ul>
+                    {% endif %}
+                </div>
+                {% if footer.include_account_options %}
+                <div class="footer-user">
+                    <ul>
+                        <li><a href="">Log in</a></li>
+                        <li><a href="">Register</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% if footer.underline_text %}
+            <div class="underline">
+                <hr class="hr">
+                <div class="col-md-8 col-sm-6 col-xs-12">
+                    <p class="copyright-text">{{ footer.underline_text }}</p>
+                </div>
+                {% endif %}
+                {% if footer.social_media_links_enabled %}
+                {% if not footer.underline_text %}
+                <div class="underline">
+                    <hr class="hr">
+                    {% endif %}
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <ul class="social-icons">
+                            {% if footer.fb_active %}
+                            {% if footer.facebook_url is not None %}
+                            {% if footer.new_window %}
+                            <li><a class="social-icon facebook" href="{{ footer.facebook_url }}" target="_blank"><i class="fa-brands fa-facebook"></i></a></li>
+                            {% else %}
+                            <li><a class="social-icon facebook" href="{{ footer.facebook_url }}"><i class="fa-brands fa-facebook"></i></a></li>
+                            {% endif %}
+                            {% else %}
+                            <li><a class="social-icon facebook" href="#"><i class="fa-brands fa-facebook"></i></a></li>
+                            {% endif %}
+              
+                      {% endif %}
+                      {% if footer.twtr_active %}
+                            {% if footer.twitter_url is not None %}
+                            {% if footer.new_window %}
+                            <li><a class="social-icon twitter" href="{{ footer.twitter_url }}" target="_blank"><i class="fa-brands fa-twitter"></i></a></li>
+                            {% else %}
+                            <li><a class="social-icon twitter" href="{{ footer.twitter_url }}"><i class="fa-brands fa-twitter"></i></a></li>
+                            {% endif %}
+                            {% else %}
+                            <li><a class="social-icon twitter" href="#"><i class="fa-brands fa-twitter"></i></a></li>
+                            {% endif %}
+                      {% endif %}
+                      {% if footer.insta_active %}
+                            {% if footer.instagram_url is not None %}
+                            {% if footer.new_window %}
+                            <li><a class="social-icon instagram" href="{{ footer.instagram_url }}" target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
+                      {% else %}
+                      <li><a class="social-icon instagram" href="{{ footer.instagram_url }}"><i class="fa-brands fa-instagram"></i></a></li>
+                      {% endif %}
+                      {% else %}
+                            <li><a class="social-icon instagram" href="#"><i class="fa-brands fa-instagram"></i></a></li>
+                            {% endif %}
+                      {% endif %}
+                      {% if footer.in_active %}
+                            {% if footer.linkedin is not None %}
+                            {% if footer.new_window %}
+                            <li><a class="social-icon linkedin" href="{{ footer.linkedin }}" target="_blank"><i class="fa-brands fa-linkedin"></i></a></li>
+                            {% else %}
+                            <li><a class="social-icon linkedin" href="{{ footer.linkedin }}"><i class="fa-brands fa-linkedin"></i></a></li>
+                            {% endif %}
+                            {% else %}
+                            <li><a class="social-icon linkedin" href="#"><i class="fa-brands fa-linkedin"></i></a></li>
+                            {% endif %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {% if footer.underline_text %}
+            </div>
+            {% else %}
+            <br> 
+        </div>
+        {% endif %}
+    </div>
+</footer>
+{% endif %}

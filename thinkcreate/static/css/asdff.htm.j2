@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+
+ 		<div class="main-content"> 
+ 			{% if posts %}
+ 			{% for post in posts %}
+			{% if post.featured %}
+			<h1>Featured Post</h1>
+				 		<div class="blog-post featured">
+			<div class="blog-title">
+				<h1 class="blog-title"><a class="blog" href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+			</div>
+			<div class="blog-content-preview">{{ post.content | safe | truncatewords:55 }}</div>
+		     <div class="blog-footer">
+		     {% if post.categories.count > 0 %}
+				    <div class="blog-tags">
+
+		    	<span class="heavy">Categories:</span>
+	
+
+		      <ul>
+ 				{% for category in post.categories.all %}
+		       <form id="tag-search-{{ category }}" action="{% url 'search-cat' %}" class="search-form">
+				<li><input type="hidden" name="q" value="{{ category }}"><a href="#" onclick="document.getElementById('tag-search-{{ category }}').submit();"><li>{{ category }}</li>
+			</a></form>	
+		    {% endfor %}
+		      </ul>
+		    </div>
+		    {% else  %}
+			<div class="blog-tags">
+		    	<div class="uncategorized">
+		    	<span>Uncategorized</span>
+		    	</div>
+		    </div>
+		    {% endif %}
+		    <div class="blog-info">
+		    <ul>
+		      <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+		      <li class="comments"><a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;</li>
+		      <li class="author"><a href="#">by {{ post.author }}</a></li>
+		    </ul>
+		  </div>
+		  </div>
+		</div>
+			{% endif %}
+ 			{% endfor %}
+
+
+
+
+<script type="text/javascript"> 
+   let order = "{{ order }}";
+</script>
+
+
+
+
+{% if order == 'latest' %}
+ 			<div class="flex-row"><h1>Latest Posts</h1>
+
+<label class="dropdown">
+
+  <div class="dd-button">
+ 
+ 
+
+  <div class="dd-input">
+
+  <ul class="dd-menu">
+    <li onclick="order = 'oldest'">Oldest Posts</li>
+    <li onclick="order='author_a-z'">By Author (A-Z)</li>
+    <li onclick="order='author_z-a'">By Author (Z-A)</li>
+    <li class="divider"></li>
+
+
+
+<!--     <li>
+      <a href="http://rane.io">Link to Rane.io</a>
+    </li> -->
+  </ul>
+</div> </div>
+  
+</label>
+
+
+
+ 			</div>
+ 				{% for post in posts %}
+ 		<div class="blog-post highlight">
+			<div class="blog-title">
+				<h1 class="blog-title"><a class="blog" href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+			</div>
+			<div class="blog-content-preview">{{ post.content | safe | truncatewords:55 }}</div>
+		     <div class="blog-footer">
+		     {% if post.categories.count > 0 %}
+				    <div class="blog-tags">
+
+		    	<span class="heavy">Categories:</span>
+	
+
+		      <ul>
+ 				{% for category in post.categories.all %}
+		       <form id="tag-search-{{ category }}" action="{% url 'search-cat' %}" class="search-form">
+				<li><input type="hidden" name="q" value="{{ category }}"><a href="#" onclick="document.getElementById('tag-search-{{ category }}').submit();"><li>{{ category }}</li>
+			</a></form>	
+		    {% endfor %}
+		      </ul>
+		    </div>
+		    {% else  %}
+			<div class="blog-tags">
+		    	<div class="uncategorized">
+		    	<span>Uncategorized</span>
+		    	</div>
+		    </div>
+		    {% endif %}
+		    <div class="blog-info">
+		    <ul>
+		      <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+		      <li class="comments"><a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;</li>
+		      <li class="author"><a href="#">by {{ post.author }}</a></li>
+		    </ul>
+		  </div>
+		  </div>
+		</div>
+ 				{% endfor %}
+ 			{% elif not posts %}
+ 			<div class="noposts">
+ 				<p>No blog posts to show</p>
+ 			</div>
+ 			{% endif %}
+
+{% if posts.has_other_pages %}
+  <ul class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}"><li>&laquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if posts.number == i %}
+        <li class="active"><span>{{ i }}</span></li>
+      {% else %}
+        <a href="?page={{ i }}"><li>{{ i }}</li></a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+     <a href="?page={{ posts.next_page_number }}"> <li>&raquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+  {% endif %}
+
+
+
+
+{% elif order == 'oldest' %}
+
+
+
+ 			<div class="flex-row"><h1>Oldest Posts</h1>
+
+<label class="dropdown">
+
+  <div class="dd-button">
+ 
+ 
+
+  <div class="dd-input">
+
+  <ul class="dd-menu">
+    <li onclick="order = 'latest'">Latest Posts</li>
+    <li onclick="order='author_a-z'">By Author (A-Z)</li>
+    <li onclick="order='author_z-a'">By Author (Z-A)</li>
+    <li class="divider"></li>
+<!--     <li>
+      <a href="http://rane.io">Link to Rane.io</a>
+    </li> -->
+  </ul>
+</div> </div>
+  
+</label>
+
+
+<script type="text/javascript">
+	if order != "{{ order }}" {
+		{{ order }} = order;
+	}
+
+</script>
+ 			</div>
+ 				{% for post in posts %}
+ 		<div class="blog-post highlight">
+			<div class="blog-title">
+				<h1 class="blog-title"><a class="blog" href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+			</div>
+			<div class="blog-content-preview">{{ post.content | safe | truncatewords:55 }}</div>
+		     <div class="blog-footer">
+		     {% if post.categories.count > 0 %}
+				    <div class="blog-tags">
+
+		    	<span class="heavy">Categories:</span>
+	
+
+		      <ul>
+ 				{% for category in post.categories.all %}
+		       <form id="tag-search-{{ category }}" action="{% url 'search-cat' %}" class="search-form">
+				<li><input type="hidden" name="q" value="{{ category }}"><a href="#" onclick="document.getElementById('tag-search-{{ category }}').submit();"><li>{{ category }}</li>
+			</a></form>	
+		    {% endfor %}
+		      </ul>
+		    </div>
+		    {% else  %}
+			<div class="blog-tags">
+		    	<div class="uncategorized">
+		    	<span>Uncategorized</span>
+		    	</div>
+		    </div>
+		    {% endif %}
+		    <div class="blog-info">
+		    <ul>
+		      <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+		      <li class="comments"><a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;</li>
+		      <li class="author"><a href="#">by {{ post.author }}</a></li>
+		    </ul>
+		  </div>
+		  </div>
+		</div>
+ 				{% endfor %}
+ 			{% elif not posts %}
+ 			<div class="noposts">
+ 				<p>No blog posts to show</p>
+ 			</div>
+ 			{% endif %}
+
+{% if posts.has_other_pages %}
+  <ul class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}"><li>&laquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if posts.number == i %}
+        <li class="active"><span>{{ i }}</span></li>
+      {% else %}
+        <a href="?page={{ i }}"><li>{{ i }}</li></a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+     <a href="?page={{ posts.next_page_number }}"> <li>&raquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+
+
+
+{% elif order == 'author_a-z' %}
+
+
+ 			<div class="flex-row"><h1>Posts by By Author (A-Z)</h1>
+
+<label class="dropdown">
+
+  <div class="dd-button">
+ 
+ 
+
+  <div class="dd-input">
+
+  <ul class="dd-menu">
+    <li onclick="order ='latest'">Latest Posts</li>
+    <li onclick="order='oldest'">Oldest Posts</li>
+    <li onclick="order='author_z-a'">By Author (Z-A)</li>
+    <li class="divider"></li>
+<!--     <li>
+      <a href="http://rane.io">Link to Rane.io</a>
+    </li> -->
+  </ul>
+</div> </div>
+  
+</label>
+
+<script type="text/javascript">
+	if order != "{{ order }}" {
+		{{ order }} = order;
+	}
+
+</script>
+ 			</div>
+ 				{% for post in posts %}
+ 		<div class="blog-post highlight">
+			<div class="blog-title">
+				<h1 class="blog-title"><a class="blog" href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+			</div>
+			<div class="blog-content-preview">{{ post.content | safe | truncatewords:55 }}</div>
+		     <div class="blog-footer">
+		     {% if post.categories.count > 0 %}
+				    <div class="blog-tags">
+
+		    	<span class="heavy">Categories:</span>
+	
+
+		      <ul>
+ 				{% for category in post.categories.all %}
+		       <form id="tag-search-{{ category }}" action="{% url 'search-cat' %}" class="search-form">
+				<li><input type="hidden" name="q" value="{{ category }}"><a href="#" onclick="document.getElementById('tag-search-{{ category }}').submit();"><li>{{ category }}</li>
+			</a></form>	
+		    {% endfor %}
+		      </ul>
+		    </div>
+		    {% else  %}
+			<div class="blog-tags">
+		    	<div class="uncategorized">
+		    	<span>Uncategorized</span>
+		    	</div>
+		    </div>
+		    {% endif %}
+		    <div class="blog-info">
+		    <ul>
+		      <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+		      <li class="comments"><a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;</li>
+		      <li class="author"><a href="#">by {{ post.author }}</a></li>
+		    </ul>
+		  </div>
+		  </div>
+		</div>
+ 				{% endfor %}
+ 			{% elif not posts %}
+ 			<div class="noposts">
+ 				<p>No blog posts to show</p>
+ 			</div>
+ 			{% endif %}
+
+{% if posts.has_other_pages %}
+  <ul class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}"><li>&laquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if posts.number == i %}
+        <li class="active"><span>{{ i }}</span></li>
+      {% else %}
+        <a href="?page={{ i }}"><li>{{ i }}</li></a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+     <a href="?page={{ posts.next_page_number }}"> <li>&raquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+
+
+
+{% elif order == 'author_z-a' %}
+
+
+ 			<div class="flex-row"><h1>Posts by By Author (Z-A)</h1>
+
+<label class="dropdown">
+
+  <div class="dd-button">
+ 
+ 
+
+  <div class="dd-input">
+
+  <ul class="dd-menu">
+    <li onclick="order ='latest'">Latest Posts</li>
+    <li onclick="order='oldest'">Oldest Posts</li>
+    <li onclick="order='author_a-z'">By Author (A-Z)</li>
+    <li class="divider"></li>
+<!--     <li>
+      <a href="http://rane.io">Link to Rane.io</a>
+    </li> -->
+  </ul>
+</div> </div>
+  
+</label>
+
+<script type="text/javascript">
+	if order != "{{ order }}" {
+		{{ order }} = order;
+	}
+
+</script>
+ 			</div>
+ 				{% for post in posts %}
+ 		<div class="blog-post highlight">
+			<div class="blog-title">
+				<h1 class="blog-title"><a class="blog" href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+			</div>
+			<div class="blog-content-preview">{{ post.content | safe | truncatewords:55 }}</div>
+		     <div class="blog-footer">
+		     {% if post.categories.count > 0 %}
+				    <div class="blog-tags">
+
+		    	<span class="heavy">Categories:</span>
+	
+
+		      <ul>
+ 				{% for category in post.categories.all %}
+		       <form id="tag-search-{{ category }}" action="{% url 'search-cat' %}" class="search-form">
+				<li><input type="hidden" name="q" value="{{ category }}"><a href="#" onclick="document.getElementById('tag-search-{{ category }}').submit();"><li>{{ category }}</li>
+			</a></form>	
+		    {% endfor %}
+		      </ul>
+		    </div>
+		    {% else  %}
+			<div class="blog-tags">
+		    	<div class="uncategorized">
+		    	<span>Uncategorized</span>
+		    	</div>
+		    </div>
+		    {% endif %}
+		    <div class="blog-info">
+		    <ul>
+		      <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+		      <li class="comments"><a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;</li>
+		      <li class="author"><a href="#">by {{ post.author }}</a></li>
+		    </ul>
+		  </div>
+		  </div>
+		</div>
+ 				{% endfor %}
+ 			{% elif not posts %}
+ 			<div class="noposts">
+ 				<p>No blog posts to show</p>
+ 			</div>
+ 			{% endif %}
+
+{% if posts.has_other_pages %}
+  <ul class="pagination">
+    {% if posts.has_previous %}
+      <a href="?page={{ posts.previous_page_number }}"><li>&laquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in posts.paginator.page_range %}
+      {% if posts.number == i %}
+        <li class="active"><span>{{ i }}</span></li>
+      {% else %}
+        <a href="?page={{ i }}"><li>{{ i }}</li></a>
+      {% endif %}
+    {% endfor %}
+    {% if posts.has_next %}
+     <a href="?page={{ posts.next_page_number }}"> <li>&raquo;</li></a>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
+  {% endif %}
+
+<script type="text/javascript"> 
+  {{ order }} = order;
+</script>
+<script type="text/javascript">
+	if ("{{ order }}" != order) {
+		{{ order }} = order;
+	}
+</script>
+<form id="order" action="{% url 'order' %}">
+	<input type="hidden" name="order_by" value=""><a href="#" onclick="document.getElementById('cat-search-{{cat.categories__title}}').submit();">{{ cat.categories__title }}</a>
+		
+</form>
+
+  {% include 'partials/_sidebar.html' with categories=category_count most_recent=most_recent %}
+	</div> 	
+{% endblock %}

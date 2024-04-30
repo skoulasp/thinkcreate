@@ -1,0 +1,113 @@
+{% load static %}
+<header class="main-header animated">
+    <div class="wrap-header">
+        <div class="nav-dropdown">
+        </div>
+        <div>
+            <nav class="main-nav">
+                <div class="brand">
+                    {% if settings.navbar_logo %}
+                    <img src="{{ settings.navbar_logo.url }}" alt="">
+                    {% else %}
+                    <a class="site-name" href="{% url 'index' %}">{{ settings.site_name }}</a>
+                    {% endif %}
+                </div>
+                <div class="main-nav__items">
+                    <ul class="main-nav__items dynamic animated">
+                        {% for page in pages %}
+                        {% if page.page_link_location == 'Navbar' or page.page_link_location == 'Both Navbar & Footer' %}
+                        {% with '/'|add:page.slug|add:'/' as slug %}
+                        <li {% if slug == request.path %}class="active"{% else %}class=""{% endif %}>
+                        {% endwith %}<a href="{% url 'page' page.slug %}">{{ page.title }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                        {% if not settings.hide_blog_section %}
+                        <li {% if request.path == '/blog/' %}class="active"{% else %}class=""{% endif %}>
+                        <a href="{% url 'blog' %}">Blog</a>
+                        </li>{% endif %}
+                    </ul>
+                    {% if not settings.hide_search_icon %}
+                    <form id="search" action="{% url 'search' %}" class="search-form animated fadeIn">
+                        <label for="search" >
+                            <input id="search-box" type="search" name="q" autocomplete="off" class="animated" placeholder="Search site...">
+                        </label>
+                        <a id="search-btn" ><i class="fa fa-search fa-lg animated" aria-hidden="true"></i></a>
+                        <a id="close-btn" class="invisible" ><i class="fas fa-times fa-lg animated" aria-hidden="true"></i></a>
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="nav-user">
+                    <ul class="nav-user__items">
+                        {% if user.is_authenticated and user.is_admin%}
+                        <li class="no-hover"><span> Welcome, <a href="{% url 'profile' user.username %}">{{ user.full_name }}</a> 👋</span></li>
+                        <li class="admin-icon"><a href="{% url 'admin:index' %}">Admin Panel</a></li>
+                        <li class="logout-icon"><a href="{% url 'logout' %}">Logout</a></li>
+                        {% elif user.is_authenticated and not user.is_admin%}
+                        <li class="no-hover"><span> Welcome, <a href="{% url 'profile' user.username %}">{{ user.full_name }}</a> 👋</span></li>
+                        <li class="dashboard-icon"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                        {% if not settings.hide_account_options %}
+                        <li class="login-icon"><a href="{% url 'login' %}">Log in</a></li>
+                        <li class="register-icon"><a href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="mobile-dropdown">
+        </div>
+    </div>
+    <div class="nav-dropdown-button animated">
+        <div class="mobile-input animated">
+            <ul class="nav-menu">
+                <li>Main Navigation</li>
+                {% for page in pages %}
+                {% if page.page_link_location == 'Navbar' or page.page_link_location == 'Both Navbar & Footer' %}
+                {% with '/'|add:page.slug|add:'/' as slug %}
+                <li {% if slug == request.path %}class="active"{% else %}class=""{% endif %}>
+                {% endwith %}<a href="{% url 'page' page.slug %}">{{ page.title }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if not settings.hide_blog_section %}
+                <li {% if request.path == '/blog/' %}class="active"{% else %}class=""{% endif %}>
+                <a href="{% url 'blog' %}">Blog</a>
+                </li>
+                {% endif %}
+                <li>
+                    {% if not settings.hide_search_icon %}	
+                    <form id="mobile-search" action="{% url 'search' %}" class="animated fadeIn">
+                        <label for="search" >
+                            <input type="search" name="q" class="search-form-mobile" placeholder="Search site...">
+                        </label>
+                        <br><br>
+                        <button type="submit" class="searchbtn-mobile">Go</button>
+                    </form>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="mobile-dropdown-button animated">
+        <div class="mobile-input animated">
+            <ul class="mobile-menu">
+                {% if user.is_authenticated and user.is_admin or user.is_staff%}
+                <li class="no-hover mobile-info"><span>Logged in as <a href="{% url 'profile' user.username %}">{{ user.full_name }}</a></span></li>
+                <li class="admin-icon"><a href="{% url 'admin:index' %}">Admin Panel</a></li>
+                <li class="logout-icon"><a href="{% url 'logout' %}">Logout</a></li>
+                {% elif user.is_authenticated and not user.is_admin %}
+                <li class="no-hover mobile-info"><span>Logged in as <a href="{% url 'profile' user.username %}">{{ user.full_name }}</a></span></li>
+                <li class="dashboard-icon"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                {% if not settings.hide_account_options %}
+                <li class="no-hover mobile-info"><span>Anonymous User</span></li>
+                <li class="login-icon"><a href="{% url 'login' %}">Log in</a></li>
+                <li class="register-icon"><a href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="post-content">
+{% include 'partials/_alerts.html'%}
+		<div class="main-content-blog-post animated fadeIn"> 
+		<div class="blog-post animated fadeIn">
+			<div class="msg-detail"></div>
+			<ul class="msg-header">
+				<li><strong>Sender:</strong> <span style="display:inline-block;margin-left: 10px;">{{message.sender}}</span></li>
+				<li><strong>Recipient:</strong> <span style="display:inline-block;margin-left: 10px;">{{message.receiver}}</span></li>
+				<li><strong>Date:</strong> <span style="display:inline-block;margin-left: 10px;">{{message.date}}</span></li>
+			</ul>
+		<h2>Subject: <span style="font-weight: 400;font-size: 1.3rem;display:inline-block;margin-left: 10px;">{{ message.subject }}</span></h2>
+		<hr style="margin: 30px 0;">
+		<article>{{ message.message }}</article>
+
+	</div>
+</div>
+<div class="dash-btns animated fadeInUp">
+
+<a href="{% url 'msg' user.username %}" class="edit-profile-btn">Back to List</a>
+<a href="{% url 'message' message.receiver %}" class="reply-profile-btn">Reply</a>
+</div>
+{% endblock %}

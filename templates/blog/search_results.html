@@ -1,0 +1,174 @@
+{% extends 'base.html' %} {% load static %} {% load humanize %} {% block content %} {% if not categorized_posts and not onlyposts %}
+<div class="main-content">
+    <h1 class="search-results">Search results for: <span>"{{ query }}"</span></h1>
+    {% if posts %}
+    <h1 class="search-results">
+        {{ posts.count }} {% if posts.count == 1 %}
+        <span>result</span>
+        {% else %}
+        <span>results</span>
+        {% endif %} found in the blog
+    </h1>
+    {% for post in posts %}
+    <div class="blog-post highlight">
+        <div class="blog-title">
+            <h1><a href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+        </div>
+        <div class="blog-content-preview">{{ post.content | safe | truncatewords:70 }}</div>
+        <div class="blog-footer">
+            {% if post.categories.count > 0 %}
+            <div class="blog-tags">
+                <div>Categories:</div>
+                <ul>
+                    {% for category in post.categories.all %}
+                    <li><a href="#">{{ category }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+            <div class="blog-tags">
+                <div>Uncategorized</div>
+            </div>
+            {% endif %}
+            <div class="blog-info">
+                <ul>
+                    <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+                    <li class="comments">
+                        <a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;
+                    </li>
+                    <li class="shares"><a href="#">1 share</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endfor %} {% endif %} {% endif %} {% if search_pages and not categorized_posts and not onlyposts %}
+    <h1 class="search-results">
+        {{ search_pages.count }} {% if search_pages.count == 1 %}
+        <span>result</span>
+        {% else %}
+        <span>results</span>
+        {% endif %} found in pages
+    </h1>
+    {% for page in search_pages %}
+    <div class="listed-page highlight">
+        <div class="blog-title">
+            <h1><a href="{% url 'page' page.slug %}">{{ page.title }}</a></h1>
+        </div>
+        <div class="blog-content-preview">{{ page.content | safe | truncatewords:60 }}</div>
+    </div>
+    {% endfor %} {% endif %} {% if categorized_posts %}
+    <div class="main-content">
+        <h1 class="search-results">Posts that match the category: <span>"{{ query }}"</span></h1>
+        <h1 class="search-results">
+            {{ categorized_posts.count }} {% if categorized_posts.count == 1 %}
+            <span>result</span>
+            {% else %}
+            <span>results</span>
+            {% endif %} found in the blog
+        </h1>
+        {% for cat_post in categorized_posts %}
+        <div class="blog-post highlight">
+            <div class="blog-title">
+                <h1><a href="{% url 'post' cat_post.slug %}">{{ cat_post.title }}</a></h1>
+            </div>
+            <div class="blog-content-preview">{{ cat_post.content | safe | truncatewords:70 }}</div>
+            <div class="blog-footer">
+                {% if cat_post.categories.count > 0 %}
+                <div class="blog-tags">
+                    <div>Categories:</div>
+                    <ul>
+                        {% for category in cat_post.categories.all %}
+                        <li><a href="#">{{ category }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <div class="blog-tags">
+                    <div>Uncategorized</div>
+                </div>
+                {% endif %}
+                <div class="blog-info">
+                    <ul>
+                        <li class="published-date">Published {{ cat_post.date | naturaltime }} &middot;</li>
+                        <li class="comments">
+                            <a href="{% url 'post' cat_post.slug %}#view-comments">{{ cat_post.comments.count }} comments</a> &middot;
+                        </li>
+                        <li class="shares"><a href="#">1 share</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %} {% endif %} {% if onlyposts %}
+        <div class="main-content">
+            <h1 class="search-results">Blog results for query: <span>"{{ query }}"</span></h1>
+            <h1 class="search-results">
+                {{ onlyposts.count }} {% if onlyposts.count == 1 %}
+                <span>result</span>
+                {% else %}
+                <span>results</span>
+                {% endif %} found
+            </h1>
+            {% for post in onlyposts %}
+            <div class="blog-post highlight">
+                <div class="blog-title">
+                    <h1><a href="{% url 'post' post.slug %}">{{ post.title }}</a></h1>
+                </div>
+                <div class="blog-content-preview">{{ post.content | safe | truncatewords:70 }}</div>
+                <div class="blog-footer">
+                    {% if post.categories.count > 0 %}
+                    <div class="blog-tags">
+                        <div>Categories:</div>
+                        <ul>
+                            {% for category in onlyposts.categories.all %}
+                            <li><a href="#">{{ category }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="blog-tags">
+                        <div>Uncategorized</div>
+                    </div>
+                    {% endif %}
+                    <div class="blog-info">
+                        <ul>
+                            <li class="published-date">Published {{ post.date | naturaltime }} &middot;</li>
+                            <li class="comments">
+                                <a href="{% url 'post' post.slug %}#view-comments">{{ post.comments.count }} comments</a> &middot;
+                            </li>
+                            <li class="shares"><a href="#">1 share</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %} {% endif %} {% if not posts and not search_pages %} {% if not categorized_posts and not onlyposts %}
+            <div class="noresults">
+                <p>No results found</p>
+                <p>🤷</p>
+            </div>
+            {% endif %} {% endif %} {% if posts.has_other_pages %}
+            <ul class="pagination">
+                {% if posts.has_previous %}
+                <a href="?page={{ posts.previous_page_number }}">
+                    <li>&laquo;</li>
+                </a>
+                {% else %}
+                <li class="disabled"><span>&laquo;</span></li>
+                {% endif %} {% for i in posts.paginator.page_range %} {% if posts.number == i %}
+                <li class="active"><span>{{ i }}</span></li>
+                {% else %}
+                <a href="?page={{ i }}">
+                    <li>{{ i }}</li>
+                </a>
+                {% endif %} {% endfor %} {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}">
+                    <li>&raquo;</li>
+                </a>
+                {% else %}
+                <li class="disabled"><span>&raquo;</span></li>
+                {% endif %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endblock %}
+    </div>
+</div>

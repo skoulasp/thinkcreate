@@ -1,0 +1,142 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+ {% block title %}ThinkCreate Admin Panel{% endblock %}
+{% block extrahead %}
+<link rel="shortcut icon" href="{% static 'app/img/favicon.ico'  %}" />
+{% endblock %}
+{% block branding %}
+<h1 id="head">THINKCREATE</h1>
+{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+{% block footer %}
+{{ block.super }}
+<script type="text/javascript">
+
+    let usr = "{{ request.user }}"
+    let sender;
+    let subj;
+    
+    function reloadWithQueryStringVars(queryStringVars) {
+        var existingQueryVars = location.search ? location.search.substring(1).split("&") : [],
+            currentUrl = location.origin + "/admin/messaging/message/add/"
+        newQueryVars = {},
+            newUrl = currentUrl + "?";
+        if (existingQueryVars.length > 0) {
+            for (var i = 0; i < existingQueryVars.length; i++) {
+                var pair = existingQueryVars[i].split("=");
+                newQueryVars[pair[0]] = pair[1];
+            }
+        }
+        if (queryStringVars) {
+            for (var queryStringVar in queryStringVars) {
+                newQueryVars[queryStringVar] = queryStringVars[queryStringVar];
+            }
+        }
+        if (newQueryVars) {
+            for (var newQueryVar in newQueryVars) {
+                newUrl += newQueryVar + "=" + newQueryVars[newQueryVar] + "&";
+            }
+            newUrl = newUrl.substring(0, newUrl.length - 1);
+            window.location.href = newUrl;
+    
+        } else {
+            window.location.href = location.href;
+        }
+    }
+    
+    
+    let btn = document.querySelector(".submit-row")
+    let com = document.getElementById("content")
+    
+    if (document.querySelector(".field-sender")) {
+        let sender = document.querySelector(".field-sender").children[0].children[1].textContent
+    }
+    
+    if (document.querySelector(".field-subject")) {
+        let subj = "RE: " + document.querySelector(".field-subject").children[0].children[1].textContent
+    }
+    
+    if (com.children[0].innerText == "CHANGE COMMENT") {
+        com.children[0].innerHTML = "APPROVE COMMENT";
+    } else if (com.children[0].innerText == "CHANGE CONTACT FORM SUBMISSIONS") {
+        com.children[0].innerHTML = "Viewing Message from Contact Form";
+    }
+    
+    if (com.children[0].innerText == "APPROVE COMMENT" && btn.children[2] !== null) {
+        btn.children[2].remove();
+    
+    }
+    
+    if (com.children[0].innerText == "CHANGE COMMENT" && btn.children[2] !== null) {
+        btn.children[2].remove();
+    
+    }
+    
+    if (com.children[0].innerText == "VIEWING MESSAGE FROM CONTACT FORM" && btn.children[3] !== null) {
+        btn.children[3].remove();
+    
+    }
+    
+    if (com.children[0].innerText == "VIEWING MESSAGE FROM CONTACT FORM" && btn.children[2] !== null) {
+        btn.children[2].value = "Reply";
+    
+    }
+    if (com.children[0].innerText == "VIEWING MESSAGE FROM CONTACT FORM" && btn.children[0] !== null) {
+        btn.children[0].remove();
+    
+    
+    }
+    
+    document.addEventListener('click', (e) => {
+        if (e.target.value == "Reply") {
+            e.preventDefault()
+            reloadWithQueryStringVars({
+                "sender": sender,
+                "subject": subj
+            })
+        }
+    })
+    
+    let q = location.search.substring(1).split("&")
+    q = q[0].split("=");
+    let selectSender = document.querySelector("#id_sender")
+    let selectReceiver = document.querySelector("#id_receiver")
+    if (selectReceiver) {
+        for (var i = 0; i < selectReceiver.options.length; ++i) {
+            if (selectReceiver.options[i].text === q[1])
+                selectReceiver.options[i].selected = true;
+        }
+    }
+    
+    if (selectSender) {
+        for (var i = 0; i < selectSender.options.length; ++i) {
+            if (selectSender.options[i].text === usr)
+                selectSender.options[i].selected = true;
+        }
+    }
+    
+    const contentTypeCheck = document.getElementById("content")
+    
+    if (contentTypeCheck != null && contentTypeCheck != undefined) {
+        if (contentTypeCheck.children[0].textContent == "Are you sure?") {
+            contentTypeCheck.classList.add("centered");
+            contentTypeCheck.children[0].classList.add("aligned");
+        }
+    }
+    
+    
+    let branding = document.getElementById("branding");
+    let anchor = document.createElement('a');
+    let headingOne = document.createElement('h1');
+    
+    anchor.setAttribute('href', '/admin/');
+    headingOne.innerText = branding.children[0].textContent;
+    headingOne.classList.add("admin-branding")
+    anchor.appendChild(headingOne);
+    branding.innerHTML = "";
+    branding.appendChild(anchor);
+    
+</script>
+{% endblock %}

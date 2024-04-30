@@ -1,0 +1,43 @@
+<div class="contact-form animated fadeIn">
+    {% if messages %}
+    {% for message in messages %}
+    <div  {% if message.tags %} class="message {{ message.tags }}" {% endif %}> {{ message }} 
+    <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+</div>
+{% endfor %}
+{% endif %}
+<h1>Send us a message</h1>
+<p>Type your message below.</p>
+<hr>
+<form action="" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <i class="fas fa-envelope"></i>
+        <h2 class="fs-title">Send a message</h2>
+        <h3 class="fs-subtitle">Please fill the following fields:</h3>
+        {% for field in contact_form %}
+        {{ field.label_tag }}
+        {% if field.help_text %}
+        <small style="color:grey">{{ field.help_text }}</small>
+        {% endif %}
+        {{ field }}
+        {% if field.id_for_label == 'id_sender' and user.is_authenticated %}
+        <select name="sender" disabled="" id="id_sender_dummy">
+            <option value="">---------</option>
+            <option value="1" selected="">Petros</option>
+        </select>
+        <br><br>
+        {% endif %}
+        {% if field.id_for_label == 'id_full_name' and user.is_authenticated %}
+        <input type="text" name="full_name" value="{{ request.user.full_name }}" disabled="" id="id_full_name_dummy">
+        {% endif %}
+        {% if field.id_for_label == 'id_email' and user.is_authenticated %}
+        <input type="email" name="email" value="{{ request.user.email }}" disabled="" id="id_email_dummy">
+        {% endif %}
+        {% endfor %}
+        <div class="singup-btns">
+            <button type="submit" href="#" class="signupbtn">Send</button>
+        </div>
+    </fieldset>
+</form>
+</div>

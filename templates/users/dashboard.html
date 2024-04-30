@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="main-content-dashboard">
+    <h1 style="text-align: center;">My Dashboard</h1>
+    <div class="dashboard">
+        {% if usr_comments %}
+        <div class="commentbox">
+            <h2 style="font-size: 1.3rem;font-weight: bold;text-align: center;">My recent comments</h2>
+            <ul>
+        {% for comment in usr_comments %}
+
+                <li>You commented <span style="font-weight: 700; font-style: italic; word-wrap: break-word;display: inline-block;"><a href="{% url 'post' comment.post.slug %}#single-comment-{{comment.id}}"">{{comment.body | truncatewords:20 | truncatechars:50}}</a></span> on a <a href="{% url 'post' comment.post.slug %}">post</a> on {{ comment.date }}</li>
+        {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        <div class="messages">
+            <h2 style="font-size: 1.3rem;font-weight: bold;text-align: center;">My Messages</h2>
+            <a href="{% url 'msg' user.username %}" class="msg-link-text" style="">View Your Messages</a>
+        </div>
+        <div class="subscription">
+            <h2 style="font-size: 1.3rem;font-weight: bold;text-align: center;">Total likes received</h2>
+            <p>{{ likes }}</p>
+        </div>
+    </div>
+    <div class="dash-btns">
+        <a {% if request.user.is_authenticated %} href="{% url 'profile' user.username %}" {% else %} href="{% url 'login' %}" {% endif %} class="view-profile-btn">View Profile</a>
+        <a {% if request.user.is_authenticated %} href="{% url 'edit' user.username %}" {% else %} href="{% url 'login' %}" {% endif %} class="edit-profile-btn">Edit Profile</a>
+    </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% include 'partials/_alerts.html'%}
+<div class="contact-form animated fadeIn">
+    {% if messages %}
+    {% for message in messages %}
+    <div  {% if message.tags %} class="message {{ message.tags }}" {% endif %}> {{ message }} 
+    <i class="fas fa-times fa-lg x-remove" aria-hidden="true"></i>
+</div>
+{% endfor %}
+{% endif %}
+<h1>Send a message to <span style="color: red;">{{ username }}</span></h1>
+<p>Type your message below.</p>
+<hr>
+<form action="" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <i class="fas fa-envelope"></i>
+        <h2 class="fs-title">Send a message</h2>
+        <h3 class="fs-subtitle">Please fill the following fields:</h3>
+        {% for field in form %}
+        {{ field.label_tag }}
+        {% if field.help_text %}
+        <small style="color:grey">{{ field.help_text }}</small>
+        {% endif %}
+        {{ field }}
+        <br>
+        {% if field.id_for_label == 'id_sender' %}
+        <select name="sender" disabled="" required="" id="id_sender">
+            <option value="">---------</option>
+            <option value="1" selected="">{{ request.user.full_name }}</option>
+        </select>
+        <br><br>
+        {% endif %}
+        {% if field.id_for_label == 'id_receiver' %}
+        <select name="receiver" disabled="" required="" id="id_receiver">
+            <option value="">---------</option>
+            <option value="1" selected="">{{ receiver }}</option>
+        </select>
+        <br><br>
+        {% endif %}
+        {% endfor %}
+        <div class="singup-btns">
+            <button type="submit" href="#" class="signupbtn">Send</button>
+        </div>
+    </fieldset>
+</form>
+</div>  
+{% endblock %}
